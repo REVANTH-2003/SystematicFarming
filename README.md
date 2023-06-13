@@ -4,7 +4,6 @@ Web Application for a farmers that display systematic farming instruction & guid
 
 # Steps to run a application :
 
-
 # Step 1 :
 
 Download & Install a python 3.10 or later versions using a below link and set a environment variables.
