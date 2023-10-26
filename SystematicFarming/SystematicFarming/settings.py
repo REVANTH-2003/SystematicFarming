@@ -88,7 +88,7 @@ DATABASES = {
 
 AUTHENTICATION_BACKENDS = [
     'apps.Users.backends.EmailBackend',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Password validation
@@ -145,3 +145,11 @@ LOGIN_REDIRECT_URL= '/auth/home'
 LOGOUT_REDIRECT_URL= '/logout'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '209fbb7f68f68c'
+EMAIL_HOST_PASSWORD = '6b9ce9c2a0a783'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True  # If your server requires TLS

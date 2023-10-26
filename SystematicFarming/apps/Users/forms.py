@@ -93,3 +93,22 @@ class OTPForm(forms.Form):
             'type':'text'
         })
     )
+
+
+class PasswordForm(forms.Form):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'password',
+            'placeholder': 'New password',
+            'required': 'required',
+            'name': 'password',
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'password',
+            'placeholder': 'Confirm password',
+            'required': 'required',
+            'name': 'confirm_password',
+        })
+    )

@@ -15,7 +15,7 @@ def Loginview(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = authenticate(request, email=email, password=password)
+            user = authenticate(request, email=email, password=password, backend='apps.Users.backends.EmailBackend')
             if user is not None:
                 login(request, user)
                 return redirect('home')
@@ -34,6 +34,7 @@ def register(request):
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
+            user.backend='apps.Users.backends.EmailBackend'
             user.set_password(form.cleaned_data['password'])
             user.save()
 
@@ -61,16 +62,18 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
-# register page - /auth/forget-password
+# register page - /auth/forgot-password
 def forgot_password(request):
     if request.method == 'POST':
         email_form = EmailForm(request.POST)
+        print('Post method executed')
         if email_form.is_valid():
             email = email_form.cleaned_data['email']
-
             try:
                 user = User.objects.get(email=email)
+                print('User found',user)
             except User.DoesNotExist:
+                print('User not found')
                 form_error = {"error":'No user associcated with this email !'}
                 form = EmailForm()
                 return render(request, 'users/forgot_password.html', {'form': form ,'form_error':form_error})
@@ -80,8 +83,11 @@ def forgot_password(request):
             user.otp = otp
             user.otp_expire = (timezone.now() + timezone.timedelta(minutes=5)) # OTP expires in 5 minutes
             user.save()
+            print(otp)
+            print('otp generated and saved')
 
             # Send OTP to the user via email
+            print('ready to send')
             send_mail(
                 'Password Reset OTP',
                 f'Your OTP for password reset is: {otp}',
@@ -89,6 +95,7 @@ def forgot_password(request):
                 [email],
                 fail_silently=False,
             )
+            print('send successfully')
 
             return redirect('otp-validation')
     else:
@@ -104,6 +111,7 @@ def otp_validation(request):
         if otp_form.is_valid():
             otp = otp_form.cleaned_data['otp']
             user = User.objects.filter(otp=otp).first()
+            user.backend='apps.Users.backends.EmailBackend'
             if user:
                 login(request,user)
                 return redirect('password-reset')
@@ -124,16 +132,22 @@ def password_reset(request):
         password_form = PasswordForm(request.POST)
         if password_form.is_valid():
             password = password_form.cleaned_data['password']
-            if user:
-                login(request,user)
-                return redirect('password-reset')
-            else:
-                form_error = {"error": 'Password must be at least 4 characters long.!'}
-                form = PasswordForm()
-                return render(request, 'users/otp.html', {'form': form ,'form_error':form_error})
+            user = User.objects.get(email = request.user.email)
+            user.backend='apps.Users.backends.EmailBackend'
+            if user and user.otp_expire > timezone.now():
+                user.set_password(password) 
+                user.otp = None
+                user.otp_expire = None
+                user.save()
+                return redirect('home')
+        else:
+            form_error = {"error": 'Password must be at least 4 characters long.!'}
+            form = PasswordForm()
+            return render(request, 'users/password_reset.html', {'form': form ,'form_error':form_error})
 
     else:
         password_form = PasswordForm()
+        return render(request,'users/password_reset.html',{'form':password_form})
 
 
 # Testing home page - /auth/home
