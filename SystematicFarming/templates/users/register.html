@@ -20,6 +20,15 @@
 
 <body class="team spad set-bg" data-setbg = {% static "static/img/blog/blog-5.jpg" %} >
 
+    <!-- ===== ERROR LOG  ===== -->
+    {% if form_error %}
+    <div class="alert alert-danger">
+        {% for error in form_error.values %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="container">
         
         <div class="form">

@@ -50,3 +50,46 @@ class RegistrationForm(forms.ModelForm):
         'required':'required'
         })
         }
+        error_messages = {
+            'fullname': {
+                'required': 'Please enter your full name.',
+            },
+            'email': {
+                'required': 'Please enter your email address.',
+                'invalid': 'Please enter a valid email address.',
+            },
+            'password': {
+                'required': 'Please enter your password.',
+            },
+            'profile': {
+                'required': 'Please upload your profile image.',
+            },
+        }
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if len(password) < 4:
+            raise forms.ValidationError("Password must be at least 4 characters long.")
+        return password
+    
+
+class EmailForm(forms.Form):
+    email = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your email',
+            'required': 'required',
+            'name': 'email',
+            'type':'email'
+        })
+    )
+
+class OTPForm(forms.Form):
+    otp = forms.CharField(
+        max_length=6,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your OTP',
+            'required': 'required',
+            'name': 'otp',
+            'type':'text'
+        })
+    )
