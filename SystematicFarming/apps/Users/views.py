@@ -153,5 +153,4 @@ def password_reset(request):
 # Testing home page - /auth/home
 @login_required
 def home(request):
-    return render(request, 'welcome.html')
-
+    return render(request, 'index.html')
